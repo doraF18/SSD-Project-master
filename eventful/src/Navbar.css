@@ -1,0 +1,154 @@
+.normal-font,
+.normal-font:hover,
+.normal-font:focus,
+.normal-font:active,
+.normal-font:focus-visible
+.normal-font::placeholder {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: normal;
+}
+
+.normal-font-control{
+    display: inline-block;
+    font-family:inherit;
+    font-size: inherit;
+    font-weight: normal;
+}
+
+.container {
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    align-content: flex-start;
+    align-items:flex-start;
+  }
+  
+  .card {
+    max-width: 300px;
+    padding:10px;
+    order: 5;
+    flex-grow: 4;
+    flex-shrink: 6;
+    flex-basis:auto;
+    align-self:flex-start;
+  }
+  
+  
+
+.normal-button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+  }
+  
+  .normal-button:hover {
+    background-color: #e0e0e0;
+    color: #222;
+    border-color: #999;
+  }
+  
+  .normal-button:active {
+    background-color: white;
+    color: black;
+  }
+  
+
+@font-face {
+    font-family: 'Nersans';
+    src: url('./fonts/NersansOne-Italic.woff2') format('woff2'),
+         url('./fonts/NersansOne-Italic.woff') format('woff');
+    font-weight: normal;  /* Adjust if necessary */
+    font-style: italic;  /* Italic style */
+  }
+
+  .navbar {
+    background-color:#F5F5F5;;
+    width: 100%;
+    height: 80px;
+  }
+  
+  .navbar-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 50px;  /* Adjust the padding to increase the left and right margins */
+  }
+  
+  .navbar-logo-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .navbar-logo-img {
+    height: 90px;
+  }
+  
+  .navbar-nav {
+    margin-right: 50px; /* Increase right margin for the left side nav items */
+  }
+  
+  .navbar-toggler {
+    margin-left: 50px; /* Increase left margin for the toggler button */
+  }
+  
+  .d-flex {
+    margin-right: 50px; /* Increase right margin for the search form */
+  }
+  
+  /* Custom font for nav links */
+  .nav-link {
+    font-family: 'Nersans', sans-serif;
+    font-weight: normal;  /* Adjust to match the font weight */
+    font-style: italic;  /* Italic style */
+    font-size: 16px;  /* Adjust the font size */
+
+  }
+
+.form 
+{
+    font-family: 'Nersans', sans-serif;
+    font-weight: normal;  /* Adjust to match the font weight */
+    font-style: normal;  /* Italic style */
+    font-size: 16px;  /* Adjust the font size */
+}
+  
+  /* Custom font for buttons */
+  .btn {
+    font-family: 'Nersans', sans-serif;
+    font-weight: normal;  /* Adjust to match the font weight */
+    font-style: italic;  /* Italic style */
+    font-size: 16px;  /* Adjust the font size */
+  }
+
+
+.form-control2{
+    font-family: inherit;
+    font-weight: normal;  /* Adjust to match the font weight */
+    font-style: italic;  /* Italic style */
+    font-size: 16px;  /* Adjust the font size */
+}
+  
+  .btn-outline-success:hover{
+    background-color:gray;
+    border-color:white; /* Change the border color */
+  }
+  .btn-outline-success {
+    border-color: #000; /* Change the border color */
+    color: #000; /* Change the color to black on hover or focus */
+    background-color: #fff; /* Change the background color to white on hover or focus */
+  }
+
+
+  
