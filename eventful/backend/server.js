@@ -9,6 +9,11 @@ const users = [
   { id: 1, email: 'user@example.com', password: 'password', role: 'Submitter' }
 ];
 
+app.get('/api/test', (req,res) =>{
+  res.json({"response":"Hello World!"});
+  res.status(200);
+})
+
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   const user = users.find(u => u.email === email && u.password === password);

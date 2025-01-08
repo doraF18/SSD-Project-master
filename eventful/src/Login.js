@@ -1,71 +1,58 @@
-import React, { useState, useEffect } from 'react';
-import { Route, Routes} from 'react-router';
-import { Link,  useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Register from './Register';
+import React, { useState } from 'react';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from './firebase'; // Import Firebase config
+import { useNavigate } from 'react-router-dom';
 import Logged from './Logged';
 import './Navbar.css';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('');
+  const [isRegister, setIsRegister] = useState(false); // Toggle between login and register
   const [message, setMessage] = useState('');
-  const [users, setUsers] = useState([]);
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Fetch users data from the URL when the component mounts
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('https://apex.oracle.com/pls/apex/laluna/login/get');
-        setUsers(response.data.items);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
-
-    fetchUsers();
-  }, []);
-
-  const handleLogin = (event) => {
+  // Handle email/password login
+  const handleEmailLogin = async (event) => {
     event.preventDefault();
-  
-    // Find user with matching email and password
-    const user = users.find(u => u.email === email && u.password === password && u.role === role);
-  
-    if (user) {
-      let token;
-      if (user.role === 'Submitter') {
-        token = 'submitter_token'; // Generate token for submitter
-      } else if (user.role === 'Attendee') {
-        token = 'attendee_token'; // Generate token for attendee
-      }
-      localStorage.setItem('token', token);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      localStorage.setItem('token', user.accessToken);
       setMessage('Login successful');
       navigate('/logged');
-    } else {
-      setMessage('Invalid credentials');
+    } catch (error) {
+      setMessage('Invalid credentials or error during login');
+      console.error('Login error:', error);
     }
   };
-  
 
+  // Handle email/password registration
   const handleRegister = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:3001/api/register', {
-        email,
-        password,
-        role
-      });
-      setMessage(response.data.message);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      setMessage('Registration successful. Please log in.');
+      setIsRegister(false); // Switch back to login form
     } catch (error) {
-      setMessage('Error connecting to the server');
+      setMessage('Error during registration');
+      console.error('Registration error:', error);
     }
   };
 
-  const handleRoleChange = (event) => {
-    setRole(event.target.value);
+  // Handle Google login
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      localStorage.setItem('token', user.accessToken);
+      setMessage('Google login successful');
+      navigate('/logged');
+    } catch (error) {
+      setMessage('Error during Google login');
+      console.error('Google login error:', error);
+    }
   };
 
   return (
@@ -73,77 +60,99 @@ export default function Login() {
       <div className="row">
         <div className="col-2"></div>
         <div className="col-8">
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label htmlFor="exampleInputEmail1" className="form-text" >
-                Email address
-              </label>
-              <input
-                type="email"
-                className="form-control" 
-                id="exampleInputEmail1"
-                aria-describedby="emailHelp"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <div id="emailHelp" className="form-text">
-                We'll never share your email with anyone else.
-              </div>
-            </div>
-            <div className="mb-3">
-              <label htmlFor="exampleInputPassword1" className="form-label">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control normal-font"
-                id="exampleInputPassword1"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="mb-3">
-              <label className="form-label">Role</label>
-              <div>
+          {isRegister ? (
+            // Registration Form
+            <form onSubmit={handleRegister}>
+              <h3>Register</h3>
+              <div className="mb-3">
+                <label htmlFor="registerEmail" className="form-text">
+                  Email address
+                </label>
                 <input
-                  type="radio"
-                  id="submitter"
-                  name="role"
-                  value="Submitter"
-                  checked={role === 'Submitter'}
-                  onChange={handleRoleChange}
+                  type="email"
+                  className="form-control"
+                  id="registerEmail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <label htmlFor="submitter">Submitter</label>
               </div>
-              <div>
+              <div className="mb-3">
+                <label htmlFor="registerPassword" className="form-label">
+                  Password
+                </label>
                 <input
-                  type="radio"
-                  id="Attendee"
-                  name="role"
-                  value="Attendee"
-                  checked={role === 'Attendee'}
-                  onChange={handleRoleChange}
+                  type="password"
+                  className="form-control"
+                  id="registerPassword"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
-                <label htmlFor="Attendee">Attendee</label>
               </div>
-            </div>
-            <br />
-            <button type="submit" className="btn btn-success">
-              Login
-            </button>
-            <button type="button" className="btn btn-success" style={{ marginLeft: '10px' }}>
-              <Link className="nav-link active" to="/register">Register</Link>
-            </button>
-          </form>
+              <button type="submit" className="btn btn-primary">
+                Register
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsRegister(false)} // Switch back to login
+                style={{ marginLeft: '10px' }}
+              >
+                Switch to Login
+              </button>
+            </form>
+          ) : (
+            // Login Form
+            <form onSubmit={handleEmailLogin}>
+              <h3>Login</h3>
+              <div className="mb-3">
+                <label htmlFor="loginEmail" className="form-text">
+                  Email address
+                </label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="loginEmail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="loginPassword" className="form-label">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="loginPassword"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn btn-success">
+                Login
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleGoogleLogin}
+                style={{ marginLeft: '10px' }}
+              >
+                Login with Google
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => navigate('/register')} // Redirect to register page
+                style={{ marginLeft: '10px' }}
+              >
+                Switch to Register
+              </button>
+            </form>
+          )}
           {message && <div className="alert alert-info mt-3">{message}</div>}
         </div>
         <div className="col-2"></div>
       </div>
-
-      <Routes>
-        <Route path='/register' element={<Register />}></Route>
-        <Route path='/logged' element={<Logged />}></Route> {/* Route for Logged component */}
-      </Routes>
     </>
   );
 }
