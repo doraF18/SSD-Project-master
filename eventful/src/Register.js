@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; 
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from './firebase';
 import { useNavigate } from 'react-router-dom';
 
@@ -17,6 +17,29 @@ export default function Register() {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      const token = await user.getIdToken();
+
+      const userWithRole = {
+        ...user,
+        role:role
+      };
+
+      const url = "http://localhost:3001/api/create";
+
+      await fetch("http://localhost:3001/api/test");
+
+      await fetch(url, {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify(userWithRole)
+      })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+
 
       // Store the user role (could be stored in Firestore for better persistence)
       localStorage.setItem('role', role);
