@@ -36,11 +36,12 @@ export default function Login() {
       localStorage.setItem('token', user.accessToken);
 
       // Fetch the user role and navigate based on it
+      
       const userRole = await getUserRole(user.uid);
       localStorage.setItem('role', userRole); // Store the role in localStorage
       setMessage('Login successful');
 
-      if (userRole === 'submitter') {
+      if (userRole === 'Submitter') {
         navigate('/submitter-dashboard'); // Navigate to submitter dashboard
       } else {
         navigate('/attendee-dashboard'); // Navigate to attendee dashboard
@@ -64,7 +65,7 @@ export default function Login() {
       localStorage.setItem('role', userRole); // Store the role in localStorage
       setMessage('Google login successful');
 
-      if (userRole === 'submitter') {
+      if (userRole === 'Submitter') {
         navigate('/submitter-dashboard');
       } else {
         navigate('/attendee-dashboard');

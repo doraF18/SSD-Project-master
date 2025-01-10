@@ -13,8 +13,9 @@ export default function Navbar() {
   };
 
   const token = localStorage.getItem('token');
+  const role = localStorage.getItem('role');
   const isLoggedIn = token !== null;
-  const isSubmitter = token === 'submitter_token';
+  const isSubmitter = role === 'Sublitter';
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
