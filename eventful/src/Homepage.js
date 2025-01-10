@@ -1,49 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import axios from 'axios';
-import Card from './Card'; // Assuming Card is defined in a separate file
-import image1 from './hai.jpg';
+import { getFirestore, collection, getDocs, orderBy, query } from 'firebase/firestore';
+import './HomePage.css'; // Optional: Add custom styles for HomePage
 
-export default function HomePage({searchValue}) {
-  const [searchQuery, setSearchQuery] = useState(''); // Not used here, but can be for future search input
-  const [searchParams] = useSearchParams(); 
+function HomePage() {
+  const [events, setEvents] = useState([]);
 
-  const [cards, setCards] = useState([]); // Empty array to store cards
-  const [displayedCards, setDisplayedCards] = useState([]); // Empty array to store cards
-
-  useEffect(() =>{
-
-    if(searchValue==="")
-      setDisplayedCards(cards);
-    else setDisplayedCards(cards.filter((c)=>c.title.toLowerCase().includes(searchValue.toLowerCase())||(c.description.toLowerCase().includes(searchValue.toLowerCase()))));
-  },[searchValue]);
+  const db = getFirestore();
 
   useEffect(() => {
-    const fetchCards = async()=> {
-        try {
-          const response = await axios.get('https://apex.oracle.com/pls/apex/laluna/show/get'); // Replace with your actual API endpoint
-          const fetchedCards = response.data.items.map((item) => ({
-            image: item.image, // Assuming you have an 'image' property or provide a default image
-            title: item.name || 'No Title Available', // Set a default title if missing
-            description: item.details.trim() || 'No Description Available', // Set a default description if missing
-          }));
-          setCards(fetchedCards);
-          setDisplayedCards(fetchedCards);
-      }catch(error)
-      {
-        console.error('Error fetching cards', error);
+    const fetchEvents = async () => {
+      try {
+        const q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const fetchedEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
       }
-      };
-    fetchCards();
-  },[]);
+    };
+
+    fetchEvents();
+  }, [db]);
 
   return (
-    <div className="container">
-        {displayedCards.map((card, index) => (
-          <div className="col-md-3 card" key={index}>
-            <Card {...card} /> 
-          </div>
-        ))}
+    <div className="homepage-container">
+      <h1 className="homepage-title">All Events</h1>
+      <div className="events-grid">
+        {events.length > 0 ? (
+          events.map((event) => (
+            <div key={event.id} className="event-card">
+              <h2 className="event-title">{event.title}</h2>
+              <p className="event-description">{event.description}</p>
+            </div>
+          ))
+        ) : (
+          <p className="no-events">No events available at the moment.</p>
+        )}
+      </div>
     </div>
   );
 }
+
+export default HomePage;

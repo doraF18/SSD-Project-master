@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import logo from './logo.png';
 import './Navbar.css';  // Ensure your CSS file is imported
@@ -15,7 +15,7 @@ export default function Navbar() {
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   const isLoggedIn = token !== null;
-  const isSubmitter = role === 'Sublitter';
+  const isSubmitter = role === 'Submitter';
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -34,7 +34,9 @@ export default function Navbar() {
           </button>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link className="nav-link active" to="/home">Home</Link>
+              <Link className="nav-link active" to="/">
+                Home
+              </Link>
             </li>
             {!isLoggedIn && (
               <>
@@ -63,7 +65,7 @@ export default function Navbar() {
             </li>
           </ul>
           <div className="navbar-logo-container">
-            <Link className="navbar-logo" to="/home">
+            <Link className="navbar-logo" to="/">
               <img src={logo} alt="Logo" className="navbar-logo-img" />
             </Link>
           </div>
