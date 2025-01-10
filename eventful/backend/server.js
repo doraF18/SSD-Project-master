@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const fs = require('fs');
 const admin = require('firebase-admin');
 const cors = require('cors');
 
@@ -35,33 +34,74 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
 };
 
-app.get('/api/test', (req,res) =>{
+app.get('/api/test', (req, res) => {
   console.log("test");
-  res.json({"response":"Hello World!"});
+  res.json({ "response": "Hello World!" });
   res.status(200);
 });
 
-app.post('/api/create', verifyFirebaseToken, async (req,res) => {
-    const docref = db.collection("users").doc(req.user.uid);
-    const doc = await docref.get();
-    console.log(req.body.role);
-    if(!doc.exists){
-      const userData = {
-        "email": req.user.email ? req.user.email : "undefined_email",
-        "role": req.body.role,
-        "history": []
-      }
+// Endpoint to create a user or update their role if they don't exist
+app.post('/api/create', verifyFirebaseToken, async (req, res) => {
+  const userDocRef = db.collection("users").doc(req.user.uid);
+  const userDoc = await userDocRef.get();
 
-      docref.set(userData);
-      res.json({"Status:": "Created"});
-      res.status(200);
-    }
-    else{
-      res.json({"Status:":"Already exists"});
-    }
+  if (!userDoc.exists) {
+    const userData = {
+      "email": req.user.email || "undefined_email",
+      "role": req.body.role || "submitter",
+      "history": []
+    };
 
+    await userDocRef.set(userData);
+    res.json({ "Status": "User created" });
+  } else {
+    res.json({ "Status": "User already exists" });
+  }
 });
 
+// Endpoint to create an event
+app.post('/api/events', verifyFirebaseToken, async (req, res) => {
+  const { title, description } = req.body;
+
+  if (!title || !description) {
+    return res.status(400).json({ message: 'Title and description are required.' });
+  }
+
+  try {
+    const eventData = {
+      title,
+      description,
+      userId: req.user.uid,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    await db.collection('events').add(eventData);
+    res.status(201).json({ message: 'Event created successfully!' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Endpoint to fetch user-specific events
+app.get('/api/events', verifyFirebaseToken, async (req, res) => {
+  try {
+    const userEventsRef = db.collection('events').where('userId', '==', req.user.uid).orderBy('createdAt', 'desc');
+    const snapshot = await userEventsRef.get();
+
+    const events = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(events);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Start the server
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');
 });
