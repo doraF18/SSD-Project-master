@@ -160,6 +160,37 @@ app.get('/api/search-events', verifyFirebaseToken, async (req, res) => {
 });
 
 
+// New endpoint to remove event from user's history
+app.post('/api/unattend-event', verifyFirebaseToken, async (req, res) => {
+  const { eventId } = req.body;
+
+  if (!eventId) {
+    return res.status(400).json({ message: 'Event ID is required.' });
+  }
+
+  try {
+    console.log(`Unattending event with ID: ${eventId}`); // Log the eventId for debugging
+
+    const userRef = db.collection('users').doc(req.user.uid); // Reference to the user's document
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Remove the event ID from the user's history array
+    await userRef.update({
+      history: admin.firestore.FieldValue.arrayRemove(eventId), // Remove the event ID from the history array
+    });
+
+    res.status(200).json({ message: 'Event removed from user history.' });
+  } catch (error) {
+    console.error('Error unattending event:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 // Start the server
 app.listen(3001, () => {
   console.log('Server running on http://localhost:3001');

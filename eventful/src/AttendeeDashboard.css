@@ -1,22 +1,84 @@
-.attend-button {
+/* Styles for the entire Attendee Dashboard */
+.attendee-dashboard-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .attendee-dashboard-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+  .event-card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .event-card:hover {
+    transform: scale(1.05);
+  }
+  
+  .event-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .event-description {
+    margin-top: 10px;
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Attend Button Styling */
+  .attend-button, .unattend-button {
+    font-size: 1rem;
+    font-weight: bold;
     padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
     border: none;
-    transition: background-color 0.3s ease;
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    width: 100%;
   }
   
-  .attend-button:disabled {
-    background-color: grey; /* Grey color when disabled */
-    cursor: not-allowed; /* Disable the pointer */
+  .attend-button {
+    background-color: #007bff;
   }
   
-  .attend-button:not(:disabled) {
-    background-color: #007bff; /* Blue color for normal state */
+  .attend-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
   }
   
-  .attend-button:not(:disabled):hover {
-    background-color: #0056b3; /* Darker blue when hovering */
+  .unattend-button {
+    background-color: #e04e39;
   }
+  
+  .unattend-button:hover {
+    background-color: #d23f2c;
+    transform: translateY(-2px);
+  }
+  
+  /* Disabled Button Styling */
+  .attend-button:disabled,
+  .unattend-button:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+    transform: none;
+  }
+  
   
