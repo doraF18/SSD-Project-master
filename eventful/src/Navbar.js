@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from './logo.png';
 import './Navbar.css';  // Ensure your CSS file is imported
+import axios from 'axios';
+import { url } from './baseUrl'; // Assuming you have a base URL setup for your API
 
 export default function Navbar() {
   const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -24,6 +27,30 @@ export default function Navbar() {
       navigate('/attendee-dashboard'); // Redirect to attendee dashboard if not a Submitter
     } else {
       navigate('/'); // Redirect to home page if a Submitter
+    }
+  };
+
+  // Function to handle search and fetch results from backend
+  const handleSearch = async (event) => {
+    event.preventDefault();
+
+    if (search.trim() === '') {
+      setSearchResults([]); // Clear results if search is empty
+      return;
+    }
+
+    try {
+      // Make an API request to your backend to search events by title
+      const response = await axios.get(`${url}/api/search-events`, {
+        params: { query: search },
+      });
+
+      if (response.status === 200) {
+        setSearchResults(response.data); // Assuming response contains event data
+      }
+    } catch (error) {
+      console.error('Error during search:', error);
+      setSearchResults([]); // Clear results on error
     }
   };
 
@@ -102,21 +129,18 @@ export default function Navbar() {
               <img src={logo} alt="Logo" className="navbar-logo-img" />
             </button>
           </div>
-          <form className="d-flex ms-auto" role="search">
+          <form className="d-flex ms-auto" role="search" onSubmit={handleSearch}>
             <input
               className="form-control me-2"
               type="search"
               placeholder="Search"
               aria-label="Search"
+              value={search}
               onChange={(event) => setSearch(event.target.value)}
             />
             <button
               className="btn btn-outline-success"
               type="submit"
-              onClick={(event) => {
-                event.preventDefault();
-                console.log(search);
-              }}
             >
               Search
             </button>
@@ -128,6 +152,22 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      {/* Display Search Results */}
+      {searchResults.length > 0 && (
+        <div className="search-results">
+          <h4>Search Results:</h4>
+          <ul>
+            {searchResults.map((event) => (
+              <li key={event.id}>
+                <button onClick={() => navigate(`/event/${event.id}`)}>
+                  {event.event_title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 }
