@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'; // Navigation after submitting
 export default function Register() {
     const [eventName, setEventName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
-    const [eventImage, setEventImage] = useState('');
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
@@ -23,7 +22,6 @@ export default function Register() {
         const eventPayload = {
             event_title: eventName,
             event_details: eventDescription,
-            event_photo: eventImage,
             user_id: auth.currentUser.uid, // Associate the event with the logged-in user
         };
 
@@ -34,7 +32,6 @@ export default function Register() {
             setMessage('Event submitted successfully');
             setEventName('');
             setEventDescription('');
-            setEventImage('');
 
             // Optionally navigate after successful submission (e.g., back to the event listing)
             navigate('/events'); // Change '/events' to your events page if needed
@@ -79,20 +76,7 @@ export default function Register() {
                         ></textarea>
                     </div>
 
-                    {/* Event Image URL Input */}
-                    <div className="mb-3">
-                        <label htmlFor="eventImage" className="form-label">
-                            Event Image URL
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            id="eventImage"
-                            value={eventImage}
-                            onChange={(e) => setEventImage(e.target.value)}
-                            required
-                        />
-                    </div>
+                    {/* Removed Event Image URL Input */}
 
                     {/* Submit Button */}
                     <button type="submit" className="btn btn-primary">

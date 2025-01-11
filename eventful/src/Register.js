@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from './firebase';
 import { useNavigate } from 'react-router-dom';
+import { url } from './baseUrl';
+
+// await fetch(url + "/api/test")
+//         .then(response => console.log(response.json()));
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -24,11 +28,7 @@ export default function Register() {
         role:role
       };
 
-      const url = "http://localhost:3001/api/create";
-
-      await fetch("http://localhost:3001/api/test");
-
-      await fetch(url, {
+      await fetch(url + "/api/create", {
           method: "POST",
           headers: {
               "Content-Type": "application/json",

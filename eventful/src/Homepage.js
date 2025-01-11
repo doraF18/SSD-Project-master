@@ -4,15 +4,17 @@ import './HomePage.css'; // Optional: Add custom styles for HomePage
 
 function HomePage() {
   const [events, setEvents] = useState([]);
-
   const db = getFirestore();
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
+        const q = query(collection(db, 'events'), orderBy('event_title', 'desc'));
         const querySnapshot = await getDocs(q);
-        const fetchedEvents = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const fetchedEvents = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setEvents(fetchedEvents);
       } catch (error) {
         console.error('Error fetching events:', error);
@@ -29,8 +31,9 @@ function HomePage() {
         {events.length > 0 ? (
           events.map((event) => (
             <div key={event.id} className="event-card">
-              <h2 className="event-title">{event.title}</h2>
-              <p className="event-description">{event.description}</p>
+              {/* Use event_title and event_details from Firestore */}
+              <h2 className="event-title">{event.event_title}</h2>
+              <p className="event-description">{event.event_details}</p>
             </div>
           ))
         ) : (

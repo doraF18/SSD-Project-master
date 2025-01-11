@@ -1,5 +1,5 @@
-import React, { useState } from 'react'; 
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logo from './logo.png';
 import './Navbar.css';  // Ensure your CSS file is imported
 
@@ -9,13 +9,23 @@ export default function Navbar() {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role'); // Clear role on logout
     navigate('/login');
   };
 
   const token = localStorage.getItem('token');
   const role = localStorage.getItem('role');
   const isLoggedIn = token !== null;
-  const isSubmitter = role === 'Submitter';
+  const isSubmitter = role === 'Submitter'; // Check if the role is "Submitter"
+  const isAttendee = role === 'Attendee'; // Check if the role is "Attendee"
+
+  const handleHomeClick = () => {
+    if (isLoggedIn && !isSubmitter) {
+      navigate('/attendee-dashboard'); // Redirect to attendee dashboard if not a Submitter
+    } else {
+      navigate('/'); // Redirect to home page if a Submitter
+    }
+  };
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
@@ -34,54 +44,88 @@ export default function Navbar() {
           </button>
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link className="nav-link active" to="/">
+              <button
+                className="nav-link active"
+                onClick={handleHomeClick} // Handle home button click here
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'inherit',
+                  fontSize: '1.25rem',
+                  cursor: 'pointer'
+                }}
+              >
                 Home
-              </Link>
+              </button>
             </li>
             {!isLoggedIn && (
               <>
-                <Link className="nav-link active" to="/login">
+                <button className="nav-link active" onClick={() => navigate('/login')}>
                   Login
-                </Link>
-                <Link className="nav-link active" to="/register">
+                </button>
+                <button className="nav-link active" onClick={() => navigate('/register')}>
                   Register
-                </Link>
+                </button>
               </>
             )}
+            {/* Only show Submit button if user is a Submitter */}
             {isSubmitter && (
-              <Link className="nav-link active" to="/submit">
-                Submit
-              </Link>
+              <li className="nav-item">
+                <button className="nav-link active" onClick={() => navigate('/submit')}>
+                  Submit
+                </button>
+              </li>
             )}
             <li className="nav-item dropdown">
-              <Link className="nav-link dropdown-toggle" to="/" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <button
+                className="nav-link dropdown-toggle"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                style={{ background: 'none', border: 'none', color: 'inherit' }}
+              >
                 Category
-              </Link>
+              </button>
               <ul className="dropdown-menu">
-                <li><Link className="dropdown-item" to="/">Arts&Crafts</Link></li>
-                <li><Link className="dropdown-item" to="/">Outside</Link></li>
-                <li><Link className="dropdown-item" to="/">Social</Link></li>
+                <li><button className="dropdown-item" onClick={() => navigate('/')}>Arts & Crafts</button></li>
+                <li><button className="dropdown-item" onClick={() => navigate('/')}>Outside</button></li>
+                <li><button className="dropdown-item" onClick={() => navigate('/')}>Social</button></li>
               </ul>
             </li>
           </ul>
           <div className="navbar-logo-container">
-            <Link className="navbar-logo" to="/">
+            <button
+              className="navbar-logo"
+              onClick={() => navigate('/')}
+              style={{ background: 'none', border: 'none' }}
+            >
               <img src={logo} alt="Logo" className="navbar-logo-img" />
-            </Link>
+            </button>
           </div>
           <form className="d-flex ms-auto" role="search">
-            <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" onChange={(event) => setSearch(event.target.value)} />
-            <button className="btn btn-outline-success" type="submit" onClick={(event) => { event.preventDefault(); console.log(search); }}>
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              onChange={(event) => setSearch(event.target.value)}
+            />
+            <button
+              className="btn btn-outline-success"
+              type="submit"
+              onClick={(event) => {
+                event.preventDefault();
+                console.log(search);
+              }}
+            >
               Search
             </button>
           </form>
-          <form>
-            {isLoggedIn && (
-              <button className="btn btn-danger" onClick={handleLogout}>
-                Logout
-              </button>
-            )}
-          </form>
+          {isLoggedIn && (
+            <button className="btn btn-danger ms-2" onClick={handleLogout}>
+              Logout
+            </button>
+          )}
         </div>
       </div>
     </nav>
